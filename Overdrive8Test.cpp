@@ -291,9 +291,7 @@ int get_temperature()
 }
 
 /**
- * Get the current fan speed. One issue with this is that it's currently only reporting the value in RPMs.
- * The only way to really convert this back would be to determine the max RPM and assume a linear curve, but
- * that probably isn't fully accurate. Not sure how reporting for this will really work.
+ * Get the current fan speed. Reports back in PWM but will also print RPM.
  */
 int get_fan_settings()
 {
@@ -345,21 +343,15 @@ int get_fan_settings()
 
 	if (
 			(odInitSetting.overdrive8Capabilities & ADL_OD8_ACOUSTIC_LIMIT_SCLK) == ADL_OD8_ACOUSTIC_LIMIT_SCLK ||
-			(odInitSetting.overdrive8Capabilities & ADL_OD8_FAN_SPEED_MIN) == ADL_OD8_FAN_SPEED_MIN
+			(odInitSetting.overdrive8Capabilities & ADL_OD8_FAN_SPEED_MIN) == ADL_OD8_FAN_SPEED_MIN ||
+			(odInitSetting.overdrive8Capabilities & ADL_OD8_FAN_CURVE) == ADL_OD8_FAN_CURVE
 		)
 	{
-		//odInitSetting.od8SettingTable
 		cout << "ADLSensorType: PMLOG_FAN_RPM" << endl;
-		cout << "PMLOG_FAN_RPM.supported: " << odlpDataOutput.sensors[PMLOG_FAN_RPM].supported << endl;
 		cout << "PMLOG_FAN_RPM.value: " << odlpDataOutput.sensors[PMLOG_FAN_RPM].value << endl;
+		cout << "PMLOG_FAN_PERCENTAGE.value: " << odlpDataOutput.sensors[PMLOG_FAN_PERCENTAGE].value << endl;
 
-		return odlpDataOutput.sensors[PMLOG_FAN_RPM].value;
-	}
-	else if ((odInitSetting.overdrive8Capabilities & ADL_OD8_FAN_CURVE) == ADL_OD8_FAN_CURVE)
-	{
-		cout << "ADLSensorType: PMLOG_FAN_RPM" << endl;
-		cout << "PMLOG_FAN_RPM.value: " << odlpDataOutput.sensors[PMLOG_FAN_RPM].value << endl;
-		return odlpDataOutput.sensors[PMLOG_FAN_RPM].value;
+		return odlpDataOutput.sensors[PMLOG_FAN_PERCENTAGE].value;
 	}
 	else
 		cout << "OD8 Fan Setting failed." << endl;
